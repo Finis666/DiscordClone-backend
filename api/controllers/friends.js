@@ -5,7 +5,7 @@ const Conversation = require("../models/Conversation");
 async function getFriends(data) {
   try {
     let getCurrUserFriends = await Friends.findOne({
-      username: data.username,
+      userId: data.userId,
     });
     // checking for if friends exists
     if (getCurrUserFriends === null) {
@@ -14,7 +14,16 @@ async function getFriends(data) {
       getCurrUserFriends = getCurrUserFriends.friends.filter((item) => {
         return item.status === "accept";
       });
-      return [{ msg: getCurrUserFriends, success: true }];
+      let friendList = [];
+      for (let i = 0; i < getCurrUserFriends.length; i++) {
+        let getUser = await User.findById(getCurrUserFriends[i].userId);
+        friendList.push({
+          userId: getCurrUserFriends[i].userId,
+          username: getUser.username,
+          active: false,
+        });
+      }
+      return [{ msg: friendList, success: true }];
     }
   } catch (err) {
     return [{ msg: "Somthing went wrong", success: false }];
@@ -33,77 +42,77 @@ async function addFriend(token, reqData) {
     if (!checkIfFriendExists) {
       return [{ msg: "Friend doesn't exists!", success: false }];
     }
-    let getCurrUser = await User.findOne({ username: token.username }).select([
-      "-password",
-      "-isAdmin",
-    ]);
-    if (getCurrUser.username === reqData.username) {
+    let reqId = checkIfFriendExists._id.toHexString();
+    if (token.userId === reqId) {
       return [{ msg: "You can't add yourself!", success: false }];
     }
     let getCurrFriends = await Friends.findOne({
-      username: getCurrUser.username,
+      userId: token.userId,
     });
     if (!getCurrFriends) {
       let addFriendCurUser = new Friends({
-        username: getCurrUser.username,
+        userId: token.userId,
         friends: [
           {
-            username: reqData.username,
+            userId: reqId,
             status: "pending",
           },
         ],
       });
       await addFriendCurUser.save();
       let checkIfFriendHasFriends = await Friends.findOne({
-        username: checkIfFriendExists.username,
+        userId: reqId,
       });
       if (!checkIfFriendHasFriends) {
         let addFriendReq = new Friends({
-          username: checkIfFriendExists.username,
+          userId: reqId,
           friends: [
             {
-              username: getCurrUser.username,
+              userId: token.userId,
               status: "waiting",
             },
           ],
         });
         await addFriendReq.save();
-        return [{ msg: "You have sent a friend request!", success: true }];
+        return [
+          {
+            msg: "You have sent a friend request!",
+            friendId: reqId,
+            success: true,
+          },
+        ];
       } else {
         let addFriend = await Friends.findOne({
-          username: checkIfFriendExists.username,
+          userId: reqId,
         });
         addFriend.friends.push({
-          username: getCurrUser.username,
+          userId: token.userId,
           status: "waiting",
         });
         await addFriend.save();
-        return [{ msg: "You have sent a friend request!", success: true }];
+        return [
+          {
+            msg: "You have sent a friend request!",
+            friendId: reqId,
+            success: true,
+          },
+        ];
       }
     }
     let msgHandle = [];
     await getCurrFriends.friends.forEach(async (element) => {
-      if (
-        element.username === reqData.username &&
-        element.status === "pending"
-      ) {
+      if (element.userId === reqId && element.status === "pending") {
         msgHandle.push({
           msg: "You already sent a friend request to this person.",
           success: false,
         });
         return msgHandle;
-      } else if (
-        element.username === reqData.username &&
-        element.status === "accept"
-      ) {
+      } else if (element.userId === reqId && element.status === "accept") {
         msgHandle.push({ msg: "You already friends.", success: false });
         return msgHandle;
-      } else if (
-        element.username === reqData.username &&
-        element.status === "waiting"
-      ) {
+      } else if (element.userId === reqId && element.status === "waiting") {
         msgHandle.push({
-          msg: `${reqData.username} already sent you a friend request!`,
+          msg: `${checkIfFriendExists.username} already sent you a friend request!`,
           success: false,
         });
         return msgHandle;
@@ -112,21 +121,21 @@ async function addFriend(token, reqData) {
     if (msgHandle.length > 0) {
       return msgHandle;
     } else {
-      let addFriend = await Friends.findOne({ username: token.username });
+      let addFriend = await Friends.findOne({ userId: token.userId });
       addFriend.friends.push({
-        username: reqData.username,
+        userId: reqId,
         status: "pending",
       });
       await addFriend.save();
       let checkIfFriendHasFriends = await Friends.findOne({
-        username: checkIfFriendExists.username,
+        userId: reqId,
       });
       if (!checkIfFriendHasFriends) {
         let addFriendReq = new Friends({
-          username: checkIfFriendExists.username,
+          userId: reqId,
           friends: [
             {
-              username: getCurrUser.username,
+              userId: token.userId,
               status: "waiting",
             },
           ],
@@ -134,49 +143,52 @@ async function addFriend(token, reqData) {
         await addFriendReq.save();
         msgHandle.push({
           msg: "You have sent a friend request!",
+          friendId: reqId,
           success: true,
         });
         return msgHandle;
       } else {
         let addFriend = await Friends.findOne({
-          username: checkIfFriendExists.username,
+          userId: reqId,
         });
         addFriend.friends.push({
-          username: getCurrUser.username,
+          userId: token.userId,
           status: "waiting",
         });
         await addFriend.save();
         msgHandle.push({
           msg: "You have sent a friend request!",
+          friendId: reqId,
           success: true,
         });
         return msgHandle;
       }
     }
   } catch (err) {
+    console.log(err);
     return [{ msg: "Please fill fields", success: false }];
   }
 }
 
 async function acceptFriend(token, reqData) {
   try {
-    let getFriendUser = await User.findOne({ username: reqData.username });
+    let getFriendUser = await User.findById(reqData.userId);
     if (getFriendUser === null) {
       return [{ msg: "method is not allowed!", success: false }];
     }
     let getCurrUserFriends = await Friends.findOne({
-      username: token.username,
+      userId: token.userId,
     });
     let getFriendUserFriends = await Friends.findOne({
-      username: reqData.username,
+      userId: reqData.userId,
     });
 
     let checkIfRequestValid = getCurrUserFriends.friends.filter((item) => {
-      return item.username === reqData.username;
+      return item.userId === reqData.userId;
     });
     if (checkIfRequestValid[0].status === "waiting") {
       let currUserNewFriendList = getCurrUserFriends.friends.map((item) => {
-        if (item.username === reqData.username) {
+        if (item.userId === reqData.userId) {
           return { ...item, status: "accept" };
         }
         return item;
@@ -184,20 +196,20 @@ async function acceptFriend(token, reqData) {
       getCurrUserFriends.friends = currUserNewFriendList;
       await getCurrUserFriends.save();
       let friendNewFriendList = getFriendUserFriends.friends.map((item) => {
-        if (item.username === token.username) {
+        if (item.userId === token.userId) {
           return { ...item, status: "accept" };
         }
         return item;
       });
       //checking members past for conversation
-      const checkForPast = await pastCheck(token, reqData.username);
+      const checkForPast = await pastCheck(token, reqData.userId);
       if (checkForPast) {
         getFriendUserFriends.friends = friendNewFriendList;
         await getFriendUserFriends.save();
         return [{ msg: "Friend got accepted!", success: true }];
       } else {
         const newConversation = new Conversation({
-          members: [token.username, reqData.username],
+          members: [token.userId, reqData.userId],
         });
         getFriendUserFriends.friends = friendNewFriendList;
         await newConversation.save();
@@ -208,38 +220,42 @@ async function acceptFriend(token, reqData) {
       return [{ msg: "method is not allowed!", success: false }];
     }
   } catch (err) {
+    console.log(err);
     return [{ msg: "Please fill fields", success: false }];
   }
 }
 
 async function declineRequest(token, reqData) {
   try {
-    if (reqData.username == undefined) {
-      return [{ msg: "Must provide username", success: false }];
+    if (reqData.userId == undefined) {
+      return [{ msg: "Must provide user id", success: false }];
     }
-    if (token.username === reqData.username) {
+    if (token.userId === reqData.userId) {
       return [{ msg: "You can't decline yourself!", success: false }];
     }
-    let getFriendUser = await Friends.findOne({ username: reqData.username });
+    let getFriendUser = await Friends.findOne({ userId: reqData.userId });
     if (!getFriendUser) {
       return [{ msg: "method is not allowed!", success: false }];
     }
     let checkIfRequestValid = getFriendUser.friends.filter((item) => {
-      return item.username === token.username;
+      return item.userId === token.userId;
     });
     if (checkIfRequestValid[0].status === "pending") {
-      let getCurrUser = await Friends.findOne({ username: token.username });
+      let getCurrUser = await Friends.findOne({ userId: token.userId });
       let r_newFriendsList = getFriendUser.friends.filter((item) => {
-        return item.username !== token.username;
+        return item.userId !== token.userId;
       });
       getFriendUser.friends = r_newFriendsList;
       await getFriendUser.save();
       let newFriendsList = getCurrUser.friends.filter((item) => {
-        return item.username !== reqData.username;
+        return item.userId !== reqData.userId;
       });
       getCurrUser.friends = newFriendsList;
       await getCurrUser.save();
-      return [{ msg: `You have declined ${reqData.username}!`, success: true }];
+      let getReqUser = await User.findById(reqData.userId);
+      return [
+        { msg: `You have declined ${getReqUser.username}!`, success: true },
+      ];
     } else {
       return [{ msg: "method is not allowed!", success: false }];
     }
@@ -249,7 +265,7 @@ async function declineRequest(token, reqData) {
 }
 async function pendingRequest(token) {
   try {
-    let getUserFriends = await Friends.findOne({ username: token.username });
+    let getUserFriends = await Friends.findOne({ userId: token.userId });
     if (!getUserFriends) {
       return [{ msg: "You have no pending requests.", success: false }];
     }
@@ -259,7 +275,16 @@ async function pendingRequest(token) {
     if (getList.length === 0) {
       return [{ msg: "You have no pending requests.", success: true }];
     }
-    return [{ msg: getList, success: true }];
+    let pendingList = [];
+    for (let i = 0; i < getList.length; i++) {
+      let getUser = await User.findById(getList[i].userId);
+      pendingList.push({
+        userId: getList[i].userId,
+        username: getUser.username,
+        status: "waiting",
+      });
+    }
+    return [{ msg: pendingList, success: true }];
   } catch (err) {
     return [{ msg: "method is not allowed!", success: false }];
   }

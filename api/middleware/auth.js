@@ -11,12 +11,13 @@ async function auth(req, res, next) {
     //checking if token valid
     const decoded = jwt.verify(token, process.env.TOKENSECRET);
     //checking if user is valid before continue
-    const checkUser = await User.findOne({ username: decoded.username });
+    const checkUser = await User.findById(decoded.userId);
     if (!checkUser) {
       res.send({ msg: "User is not valid.", success: false });
       return;
     }
-    req.user = decoded;
+    let decodedReq = { ...decoded, username: checkUser.username };
+    req.user = decodedReq;
     next();
   } catch (err) {
     res.send({ msg: "Invalid token.", success: false });

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const friendsSchema = mongoose.Schema({
-  username: {
+  userId: {
     type: String,
     required: true,
   },

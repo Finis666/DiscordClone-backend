@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const friendsSchema = mongoose.Schema(
+const messagesSchema = mongoose.Schema(
   {
     conversationId: {
       type: String,
@@ -17,6 +17,6 @@ const friendsSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const Friends = mongoose.model("friends", friendsSchema);
+const Messages = mongoose.model("messages", messagesSchema);
 
-module.exports = Friends;
+module.exports = Messages;

@@ -64,7 +64,7 @@ async function register(data) {
       });
       await newUser.save();
       let token = jwt.sign(
-        { username: data.username },
+        { userId: newUser._id.toHexString() },
         process.env.TOKENSECRET
       );
       return [
@@ -72,6 +72,7 @@ async function register(data) {
           msg: "User created.",
           token: token,
           username: data.username,
+          userId: newUser._id,
           success: true,
         },
       ];

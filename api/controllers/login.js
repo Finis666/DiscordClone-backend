@@ -15,7 +15,7 @@ async function login(data) {
       );
       if (comparePass) {
         let token = jwt.sign(
-          { username: findUserByEmail[0].username },
+          { userId: findUserByEmail[0]._id.toHexString() },
           process.env.TOKENSECRET
         );
         return [
@@ -23,6 +23,7 @@ async function login(data) {
             msg: "Logged in",
             success: true,
             username: findUserByEmail[0].username,
+            userId: findUserByEmail[0]._id,
             token: token,
           },
         ];
@@ -36,7 +37,7 @@ async function login(data) {
       );
       if (comparePass) {
         let token = jwt.sign(
-          { username: findUserByUsername[0].username },
+          { userId: findUserByUsername[0]._id.toHexString() },
           process.env.TOKENSECRET
         );
         return [
@@ -44,6 +45,7 @@ async function login(data) {
             msg: "Logged in",
             success: true,
             username: findUserByUsername[0].username,
+            userId: findUserByUsername[0]._id,
             token: token,
           },
         ];
