@@ -5,7 +5,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     methods: ["GET", "POST"],
   },
 });
@@ -123,4 +123,4 @@ io.on("connection", (socket) => {
     io.emit("removeFromActive", userId);
   });
 });
-server.listen(3001, () => console.log("Listening on port 3001"));
+server.listen(3000, () => console.log("Listening on port 3001"));

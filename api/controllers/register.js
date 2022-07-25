@@ -73,6 +73,7 @@ async function register(data) {
           token: token,
           username: data.username,
           userId: newUser._id,
+          isAdmin: false,
           success: true,
         },
       ];

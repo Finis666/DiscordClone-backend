@@ -24,6 +24,7 @@ async function login(data) {
             success: true,
             username: findUserByEmail[0].username,
             userId: findUserByEmail[0]._id,
+            isAdmin: findUserByEmail[0].isAdmin,
             token: token,
           },
         ];
@@ -46,6 +47,7 @@ async function login(data) {
             success: true,
             username: findUserByUsername[0].username,
             userId: findUserByUsername[0]._id,
+            isAdmin: findUserByUsername[0].isAdmin,
             token: token,
           },
         ];

@@ -18,6 +18,7 @@ Router.get("/validateToken", auth, (req, res) => {
     msg: "Token is valid",
     username: req.user.username,
     userId: req.user.userId,
+    isAdmin: req.user.isAdmin,
     success: true,
   });
 });

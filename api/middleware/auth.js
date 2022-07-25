@@ -16,7 +16,11 @@ async function auth(req, res, next) {
       res.send({ msg: "User is not valid.", success: false });
       return;
     }
-    let decodedReq = { ...decoded, username: checkUser.username };
+    let decodedReq = {
+      ...decoded,
+      username: checkUser.username,
+      isAdmin: checkUser.isAdmin,
+    };
     req.user = decodedReq;
     next();
   } catch (err) {
