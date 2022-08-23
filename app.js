@@ -3,6 +3,7 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
+require("dotenv").config();
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_SIDE_URL,
@@ -17,8 +18,6 @@ const admin = require("./api/routes/admin");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
-
-require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
