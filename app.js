@@ -44,6 +44,7 @@ app.use("/api/users", users);
 app.use("/api/friends", friends);
 app.use("/api/conversations", conversations);
 app.use("/api/admin", admin);
+app.use("/cdn/images", express.static(__dirname + "/public/images"));
 
 // handling web sockets
 let usersList = [];
@@ -87,6 +88,7 @@ io.on("connection", (socket) => {
       io.to(getAcceptedFriend.socketId).emit("pending_accepted", {
         reqUserId: user.currUserId,
         reqUsername: user.currUsername,
+        reqImage: user.currImage,
       });
       io.to(socket.id).emit("userIsOnline", user.reqId);
     }
@@ -99,6 +101,7 @@ io.on("connection", (socket) => {
       io.to(getFriend.socketId).emit("friend_request_get", {
         username: data.username,
         userId: data.userId,
+        image: data.image,
       });
       return;
     }
@@ -111,6 +114,7 @@ io.on("connection", (socket) => {
       io.to(getFriend.socketId).emit("new_message_get", {
         username: data.username,
         userId: data.userId,
+        image: data.image,
         text: data.text,
       });
       return;
@@ -123,4 +127,6 @@ io.on("connection", (socket) => {
     io.emit("removeFromActive", userId);
   });
 });
-server.listen(3000, () => console.log("Listening on port 3001"));
+server.listen(process.env.PORT || 3000, () =>
+  console.log(`Listening on port ${process.env.PORT}`)
+);

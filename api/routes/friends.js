@@ -1,5 +1,5 @@
 const auth = require("../middleware/auth");
-const friends = require("../controllers/friends");
+const friends = require("../utils/friends");
 const Router = require("express").Router();
 
 Router.get("/all", auth, async (req, res) => {

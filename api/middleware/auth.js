@@ -16,9 +16,14 @@ async function auth(req, res, next) {
       res.send({ msg: "User is not valid.", success: false });
       return;
     }
+    if (checkUser.isDeleted) {
+      res.send({ msg: "This user is banned, You can no longer login." });
+      return;
+    }
     let decodedReq = {
       ...decoded,
       username: checkUser.username,
+      image: checkUser.image,
       isAdmin: checkUser.isAdmin,
     };
     req.user = decodedReq;

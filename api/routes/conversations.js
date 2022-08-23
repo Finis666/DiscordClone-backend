@@ -1,8 +1,8 @@
 const Router = require("express").Router();
-const messages = require("../controllers/messages");
+const messages = require("../utils/messages");
 const auth = require("../middleware/auth");
 const conversationAuth = require("../middleware/conversationAuth");
-const conversation = require("../controllers/conversations");
+const conversation = require("../utils/conversations");
 
 // getting all conversation chats
 Router.get("/", auth, async (req, res) => {
