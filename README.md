@@ -1,24 +1,19 @@
-
 # Discord Clone
 
 Discord clone project for hackeru.
- 
-
- 
-
 
 ## Run Locally
 
 Clone the project
 
 ```bash
-  git clone https://github.com/Finis666/DiscordClone-backend
+  git clone https://github.com/Finis666/DiscordClone-backend server
 ```
 
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd server
 ```
 
 Install dependencies
@@ -30,14 +25,12 @@ Install dependencies
 Start the server
 
 ```bash
-  npm run devStart
+  npm start
 ```
-
 
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file
-
 
 `MONGOURI=your mongo db url`
 
@@ -45,11 +38,13 @@ To run this project, you will need to add the following environment variables to
 
 `PORT=3000`
 
+`SMTP_PORT=587`
+
 `SMTP_USER=your smtp credentials`
 
 `SMTP_PASSWORD=your smtp credentials`
 
-`CLIENT_SIDE_URL=http://clientsomthing.example`
+`CLIENT_SIDE_URL=http://localhost:3001`
 
 ## Features
 
@@ -60,4 +55,3 @@ To run this project, you will need to add the following environment variables to
 - Admin panel
 - Profile settings
 - etc
-
