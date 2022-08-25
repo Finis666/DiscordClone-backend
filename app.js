@@ -106,6 +106,12 @@ io.on("connection", (socket) => {
     }
   });
 
+  // handling user logout button
+  socket.on("disconnect-user", (data) => {
+    removeUser(socket.id);
+    io.emit("removeFromActive", data.userId);
+  });
+
   // handling new message recive
   socket.on("new_message", (data) => {
     let getFriend = getUserById(data.friendId);

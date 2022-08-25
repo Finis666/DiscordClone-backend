@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 async function login(data) {
   try {
-    let findUserByEmail = await User.find({ email: data.emailOrUsername });
+    let findUserByEmail = await User.find({
+      email: data.emailOrUsername.toLowerCase(),
+    });
     let findUserByUsername = await User.find({
       username: data.emailOrUsername,
     });

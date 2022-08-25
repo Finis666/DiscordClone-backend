@@ -16,8 +16,8 @@ async function changeUsername(token, data) {
   if (!data || data.length === 0) {
     return [{ msg: "Missing fields", success: false }];
   }
-  if (data.username.length < 2 || data.username.length > 32) {
-    return [{ msg: "Username must be between 2 and 32 in length" }];
+  if (data.username.length < 2 || data.username.length > 15) {
+    return [{ msg: "Username must be between 2 and 15 in length" }];
   }
   try {
     const getUser = await User.findOne({ username: data.username });
@@ -52,8 +52,7 @@ async function forgotPassword(data) {
 
     let transporter = nodemailer.createTransport({
       host: "smtp.mailtrap.io",
-      port: 587,
-      secure: false, // true for 465, false for other ports
+      port: process.env.SMTP_PORT,
       auth: {
         user: process.env.SMTP_USER, // generated ethereal user
         pass: process.env.SMTP_PASSWORD, // generated ethereal password
@@ -65,7 +64,9 @@ async function forgotPassword(data) {
       to: data.email, // list of receivers
       subject: "Reset Password", // Subject line
       text: "Reset Password!", // plain text body
-      html: `<b>Here is a link to reset your password: <a href="http://localhost:3001/reset-password/${getUser._id.toHexString()}/${token}">Click here</a></b>`, // html body
+      html: `<b>Here is a link to reset your password: <a href="${
+        process.env.CLIENT_SIDE_URL
+      }/reset-password/${getUser._id.toHexString()}/${token}">Click here</a></b>`, // html body
     });
     return [{ msg: "Linked sent", success: true }];
   } catch (err) {

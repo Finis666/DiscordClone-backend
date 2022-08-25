@@ -15,10 +15,10 @@ async function register(data) {
         success: false,
       });
     }
-    if (data.username.length < 2 || data.username.length > 32) {
+    if (data.username.length < 2 || data.username.length > 15) {
       handleErrors.push({
         field: "username",
-        msg: "USERNAME - Must be between 2 and 32 in length",
+        msg: "USERNAME - Must be between 2 and 15 in length",
         sucess: false,
       });
     }

@@ -63,8 +63,8 @@ async function editUser(data, token) {
   if (typeof data.isAdmin !== "boolean") {
     return [{ msg: "Invalid params", success: false }];
   }
-  if (data.username.length < 2 || data.username.length > 32) {
-    return [{ msg: "Must be between 2 and 32 in length", success: false }];
+  if (data.username.length < 2 || data.username.length > 15) {
+    return [{ msg: "Must be between 2 and 15 in length", success: false }];
   }
   try {
     const validateUsername = await User.findOne({ username: data.username });
