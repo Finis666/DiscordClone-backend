@@ -51,7 +51,8 @@ async function forgotPassword(data) {
     });
 
     let transporter = nodemailer.createTransport({
-      host: "smtp.mailtrap.io",
+      host: "smtp.gmail.com",
+      service: "gmail",
       port: process.env.SMTP_PORT,
       auth: {
         user: process.env.SMTP_USER, // generated ethereal user
@@ -60,7 +61,7 @@ async function forgotPassword(data) {
     });
 
     let info = await transporter.sendMail({
-      from: '"Discord Clone" <romt31305@gmail.com>', // sender address
+      from: '"Discord Clone" <romtregerman31@gmail.com>', // sender address
       to: data.email, // list of receivers
       subject: "Reset Password", // Subject line
       text: "Reset Password!", // plain text body
