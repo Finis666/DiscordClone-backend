@@ -46,6 +46,16 @@ To run this project, you will need to add the following environment variables to
 
 `CLIENT_SIDE_URL=http://localhost:3001`
 
+
+
+## Tech Stack
+
+**Client:** React, Redux, TailwindCSS, Socket.io-client, Axios
+
+**Server:** Node, Express, MongoDB, Socket.io, JsonWebToken, NodeMailer
+
+
+
 ## Features
 
 - Login & Register
